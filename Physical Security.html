@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Security+ Physical Security PBQ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .instructions {
+      text-align: center;
+      font-size: 15px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .locations, .controls {
+      background: #ffffff;
+      padding: 15px;
+      border-radius: 6px;
+    }
+    .location {
+      border: 2px dashed #aaa;
+      padding: 10px;
+      margin-bottom: 12px;
+      min-height: 90px;
+    }
+    .location strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .dropzone {
+      min-height: 40px;
+    }
+    .control {
+      background: #e9ecef;
+      padding: 8px;
+      margin: 6px 0;
+      border-radius: 4px;
+      cursor: grab;
+    }
+    .feedback {
+      margin-top: 6px;
+      font-weight: bold;
+    }
+    .correct {
+      color: green;
+    }
+    .incorrect {
+      color: red;
+    }
+    .explanation {
+      font-weight: normal;
+      color: #333;
+      margin-top: 4px;
+    }
+    button {
+      margin: 20px 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    @media (max-width: 700px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Physical Security Controls – Drag & Drop</h1>
+
+<div class="instructions">
+  Drag each <strong>physical security control</strong> to the most appropriate location.<br>
+  Some locations require <strong>more than one control</strong> to be correctly protected.<br>
+  Each control can only be used <strong>once</strong>.
+</div>
+
+<div class="container">
+
+  <!-- LOCATIONS -->
+  <div class="locations">
+
+    <div class="location" data-id="1">
+      <strong>1. Main entrance to the building – ground floor</strong>
+      <div class="dropzone"></div>
+      <div id="f1" class="feedback"></div>
+    </div>
+
+    <div class="location" data-id="2">
+      <strong>2. Backup generator section</strong>
+      <div class="dropzone"></div>
+      <div id="f2" class="feedback"></div>
+    </div>
+
+    <div class="location" data-id="3">
+      <strong>3. Entrance to the server room</strong>
+      <div class="dropzone"></div>
+      <div id="f3" class="feedback"></div>
+    </div>
+
+    <div class="location" data-id="4">
+      <strong>4. Parking area – underground floor</strong>
+      <div class="dropzone"></div>
+      <div id="f4" class="feedback"></div>
+    </div>
+
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <strong>Available Physical Security Controls</strong>
+
+    <div class="control" draggable="true" data-control="vestibule">Access Control Vestibule</div>
+    <div class="control" draggable="true" data-control="guard">Security Officer</div>
+    <div class="control" draggable="true" data-control="cctv">CCTV</div>
+    <div class="control" draggable="true" data-control="bollards">Bollards</div>
+    <div class="control" draggable="true" data-control="rfid">RFID Badge</div>
+    <div class="control" draggable="true" data-control="biometric">Biometric Scanner</div>
+  </div>
+
+</div>
+
+<button onclick="checkAnswers()">Check Answers</button>
+<button onclick="resetAll()">Reset</button>
+
+<script>
+  const answerKey = {
+    1: {
+      required: 2,
+      correct: ["vestibule", "guard"],
+      why: "Main building entrances require active access control and tailgating prevention. Access control vestibules and security officers both enforce controlled entry."
+    },
+    2: {
+      required: 1,
+      correct: ["cctv"],
+      why: "Backup generators are critical infrastructure components. CCTV provides continuous monitoring and tamper detection."
+    },
+    3: {
+      required: 2,
+      correct: ["biometric", "rfid"],
+      why: "Server rooms require strong, auditable authentication. Biometrics and RFID badges restrict access to authorized personnel."
+    },
+    4: {
+      required: 1,
+      correct: ["bollards"],
+      why: "Bollards mitigate vehicle-based threats and are commonly used to prevent ramming attacks in parking areas."
+    }
+  };
+
+  let dragged = null;
+
+  document.querySelectorAll(".control").forEach(item => {
+    item.addEventListener("dragstart", () => dragged = item);
+  });
+
+  document.querySelectorAll(".dropzone").forEach(zone => {
+    zone.addEventListener("dragover", e => e.preventDefault());
+    zone.addEventListener("drop", e => {
+      e.preventDefault();
+      if (dragged && zone.children.length < 2) {
+        zone.appendChild(dragged);
+        dragged = null;
+      }
+    });
+  });
+
+  function checkAnswers() {
+    for (let i = 1; i <= 4; i++) {
+      const zone = document.querySelector(`.location[data-id="${i}"] .dropzone`);
+      const placed = Array.from(zone.children).map(el => el.dataset.control);
+      const feedback = document.getElementById(`f${i}`);
+      const required = answerKey[i].required;
+      const correct = answerKey[i].correct;
+
+      if (placed.length !== required || !correct.every(c => placed.includes(c))) {
+        feedback.innerHTML = `
+          Incorrect.<br>
+          <span class="explanation">
+            Required: ${correct.join(" + ").toUpperCase()}<br>
+            ${answerKey[i].why}
+          </span>`;
+        feedback.className = "feedback incorrect";
+      } else {
+        feedback.textContent = "Correct";
+        feedback.className = "feedback correct";
+      }
+    }
+  }
+
+  function resetAll() {
+    document.querySelectorAll(".dropzone").forEach(zone => zone.innerHTML = "");
+    document.querySelectorAll(".feedback").forEach(f => f.textContent = "");
+    const controls = document.querySelector(".controls");
+    controls.innerHTML = `
+      <strong>Available Physical Security Controls</strong>
+      <div class="control" draggable="true" data-control="vestibule">Access Control Vestibule</div>
+      <div class="control" draggable="true" data-control="guard">Security Officer</div>
+      <div class="control" draggable="true" data-control="cctv">CCTV</div>
+      <div class="control" draggable="true" data-control="bollards">Bollards</div>
+      <div class="control" draggable="true" data-control="rfid">RFID Badge</div>
+      <div class="control" draggable="true" data-control="biometric">Biometric Scanner</div>
+    `;
+    document.querySelectorAll(".control").forEach(item => {
+      item.addEventListener("dragstart", () => dragged = item);
+    });
+  }
+</script>
+
+</body>
+</html>

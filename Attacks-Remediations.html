@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Security+ PBQ Practice</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .scenario {
+      background: #ffffff;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border-left: 6px solid #007acc;
+    }
+    select {
+      width: 100%;
+      padding: 6px;
+      margin: 5px 0 15px;
+    }
+    .feedback {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .correct {
+      color: green;
+    }
+    .incorrect {
+      color: red;
+    }
+    .explanation {
+      font-weight: normal;
+      margin-top: 5px;
+      color: #333;
+    }
+    button {
+      margin: 20px 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .note {
+      text-align: center;
+      font-size: 14px;
+      color: #555;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Attack Identification & Remediation Practice</h1>
+
+<!-- SCENARIO 1 -->
+<div class="scenario">
+  <p><strong>Scenario 1:</strong> During peak business hours, a company’s public-facing web application becomes intermittently unavailable. Network monitoring tools report a sustained increase in incomplete TCP connection attempts from many different external IP addresses.</p>
+
+  <label>Attack Type</label>
+  <select id="attack1">
+    <option value="">-- Select --</option>
+    <option value="worm">Worm</option>
+    <option value="botnet">Botnet</option>
+    <option value="keylogger">Keylogger</option>
+    <option value="rat">RAT</option>
+    <option value="backdoor">Backdoor</option>
+  </select>
+
+  <label>Remediation</label>
+  <select id="remed1">
+    <option value="">-- Select --</option>
+    <option value="mfa">Implement MFA</option>
+    <option value="ddos">Enable DDoS Protection</option>
+    <option value="code">Conduct Code Review</option>
+    <option value="disable">Disable Remote Access Services</option>
+    <option value="default">Change Default Passwords</option>
+  </select>
+
+  <div id="feedback1" class="feedback"></div>
+</div>
+
+<!-- SCENARIO 2 -->
+<div class="scenario">
+  <p><strong>Scenario 2:</strong> A help desk technician notices that an employee’s workstation is periodically establishing outbound connections to an unknown external system. Shortly afterward, unauthorized system commands are executed without the user’s knowledge.</p>
+
+  <label>Attack Type</label>
+  <select id="attack2">
+    <option value="">-- Select --</option>
+    <option value="botnet">Botnet</option>
+    <option value="rat">RAT</option>
+    <option value="worm">Worm</option>
+    <option value="backdoor">Backdoor</option>
+    <option value="keylogger">Keylogger</option>
+  </select>
+
+  <label>Remediation</label>
+  <select id="remed2">
+    <option value="">-- Select --</option>
+    <option value="code">Conduct Code Review</option>
+    <option value="disable">Disable Remote Access Services</option>
+    <option value="ddos">Enable DDoS Protection</option>
+    <option value="default">Change Default Passwords</option>
+    <option value="mfa">Implement MFA</option>
+  </select>
+
+  <div id="feedback2" class="feedback"></div>
+</div>
+
+<!-- SCENARIO 3 -->
+<div class="scenario">
+  <p><strong>Scenario 3:</strong> Multiple systems within the same network segment begin exhibiting similar abnormal behavior within a short period of time. Investigation reveals that a backend database service was exposed using vendor-default credentials.</p>
+
+  <label>Attack Type</label>
+  <select id="attack3">
+    <option value="">-- Select --</option>
+    <option value="rat">RAT</option>
+    <option value="worm">Worm</option>
+    <option value="botnet">Botnet</option>
+    <option value="keylogger">Keylogger</option>
+    <option value="backdoor">Backdoor</option>
+  </select>
+
+  <label>Remediation</label>
+  <select id="remed3">
+    <option value="">-- Select --</option>
+    <option value="mfa">Implement MFA</option>
+    <option value="default">Change Default Application Passwords</option>
+    <option value="ddos">Enable DDoS Protection</option>
+    <option value="disable">Disable Remote Access Services</option>
+    <option value="code">Conduct Code Review</option>
+  </select>
+
+  <div id="feedback3" class="feedback"></div>
+</div>
+
+<!-- SCENARIO 4 -->
+<div class="scenario">
+  <p><strong>Scenario 4:</strong> An executive reports repeated account compromises despite antivirus scans showing no signs of malware. A physical inspection reveals an unauthorized device connected between the keyboard and the workstation.</p>
+
+  <label>Attack Type</label>
+  <select id="attack4">
+    <option value="">-- Select --</option>
+    <option value="rat">RAT</option>
+    <option value="keylogger">Keylogger</option>
+    <option value="botnet">Botnet</option>
+    <option value="worm">Worm</option>
+    <option value="backdoor">Backdoor</option>
+  </select>
+
+  <label>Remediation</label>
+  <select id="remed4">
+    <option value="">-- Select --</option>
+    <option value="ddos">Enable DDoS Protection</option>
+    <option value="mfa">Implement MFA Using Push Notification</option>
+    <option value="code">Conduct Code Review</option>
+    <option value="disable">Disable Remote Access Services</option>
+    <option value="default">Change Default Passwords</option>
+  </select>
+
+  <div id="feedback4" class="feedback"></div>
+</div>
+
+<!-- SCENARIO 5 -->
+<div class="scenario">
+  <p><strong>Scenario 5:</strong> A security review of a custom-developed application uncovers undocumented logic that allows system access without standard authentication checks.</p>
+
+  <label>Attack Type</label>
+  <select id="attack5">
+    <option value="">-- Select --</option>
+    <option value="rat">RAT</option>
+    <option value="backdoor">Backdoor</option>
+    <option value="worm">Worm</option>
+    <option value="keylogger">Keylogger</option>
+    <option value="botnet">Botnet</option>
+  </select>
+
+  <label>Remediation</label>
+  <select id="remed5">
+    <option value="">-- Select --</option>
+    <option value="mfa">Implement MFA</option>
+    <option value="code">Conduct Code Review</option>
+    <option value="ddos">Enable DDoS Protection</option>
+    <option value="disable">Disable Remote Access Services</option>
+    <option value="default">Change Default Passwords</option>
+  </select>
+
+  <div id="feedback5" class="feedback"></div>
+</div>
+
+<button onclick="checkAnswers()">Check Answers</button>
+<button onclick="resetForm()">Reset</button>
+
+<p class="note">
+This material is original, instructor-created practice content designed to reinforce general Security+ concepts.
+It does not contain actual CompTIA exam questions or proprietary materials.
+</p>
+
+<script>
+  const labels = {
+    botnet: "BOTNET",
+    worm: "WORM",
+    rat: "RAT",
+    keylogger: "KEYLOGGER",
+    backdoor: "BACKDOOR",
+    ddos: "ENABLE DDOS PROTECTION",
+    mfa: "IMPLEMENT MFA",
+    code: "CONDUCT CODE REVIEW",
+    disable: "DISABLE REMOTE ACCESS SERVICES",
+    default: "CHANGE DEFAULT PASSWORDS"
+  };
+
+  const answerKey = {
+    1: {
+      attack: "botnet",
+      remed: "ddos",
+      why: "A high volume of incomplete TCP connections from distributed sources indicates a botnet-driven denial-of-service attack. DDoS protection mitigates volumetric attacks at the network edge."
+    },
+    2: {
+      attack: "rat",
+      remed: "disable",
+      why: "Remote command execution and outbound control connections are characteristic of a Remote Access Trojan. Disabling unnecessary remote access reduces attacker control."
+    },
+    3: {
+      attack: "worm",
+      remed: "default",
+      why: "Worms spread autonomously without user interaction. Default credentials allow automated exploitation and lateral movement."
+    },
+    4: {
+      attack: "keylogger",
+      remed: "mfa",
+      why: "Hardware keyloggers capture keystrokes directly, bypassing endpoint protections. MFA protects accounts even when credentials are compromised."
+    },
+    5: {
+      attack: "backdoor",
+      remed: "code",
+      why: "Backdoors are hidden access mechanisms embedded within legitimate software. Code reviews help identify unauthorized logic paths."
+    }
+  };
+
+  function checkAnswers() {
+    for (let i = 1; i <= 5; i++) {
+      const attack = document.getElementById(`attack${i}`).value;
+      const remed = document.getElementById(`remed${i}`).value;
+      const feedback = document.getElementById(`feedback${i}`);
+
+      if (attack === answerKey[i].attack && remed === answerKey[i].remed) {
+        feedback.textContent = "Correct";
+        feedback.className = "feedback correct";
+      } else {
+        feedback.innerHTML = `
+          Incorrect.<br>
+          <span class="explanation">
+            Correct answer: ${labels[answerKey[i].attack]} + ${labels[answerKey[i].remed]}<br>
+            ${answerKey[i].why}
+          </span>`;
+        feedback.className = "feedback incorrect";
+      }
+    }
+  }
+
+  function resetForm() {
+    for (let i = 1; i <= 5; i++) {
+      document.getElementById(`attack${i}`).value = "";
+      document.getElementById(`remed${i}`).value = "";
+      document.getElementById(`feedback${i}`).textContent = "";
+    }
+  }
+</script>
+
+</body>
+</html>

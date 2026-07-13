@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Network Threat Analysis</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f2f4f8;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5em;
+      color: #1a2b4c;
+      margin-bottom: 10px;
+    }
+    .instructions {
+      background: #dceeff;
+      display: inline-block;
+      max-width: 90%;
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      font-size: 1.05em;
+      color: #23395d;
+    }
+    .diagram-container {
+      position: relative;
+      width: 100%;
+      max-width: 768px;
+      margin: 0 auto;
+    }
+    .diagram-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    }
+    .hotspot {
+      position: absolute;
+      width: 10%;
+      aspect-ratio: 1/1;
+      cursor: pointer;
+      background: rgba(0,0,0,0.01);
+      z-index: 10;
+    }
+    .log-box {
+      display: none;
+      position: fixed;
+      top: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 700px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid #3498db;
+      box-shadow: 0 0 25px rgba(0,0,0,0.2);
+      z-index: 9999;
+      text-align: left;
+    }
+    .log-box h3 {
+      margin-top: 0;
+    }
+    .close-btn {
+      float: right;
+      font-weight: bold;
+      cursor: pointer;
+      color: #888;
+    }
+    .close-btn:hover {
+      color: #e74c3c;
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 9998;
+    }
+    .log-output {
+      background: black;
+      color: white;
+      font-family: 'Courier New', monospace;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      font-size: 0.9em;
+      white-space: pre;
+    }
+.log-box h3 {
+  margin-top: 0;
+  cursor: move;
+}
+    .status-options {
+      margin-top: 15px;
+      font-size: 1em;
+      display: flex;
+      justify-content: space-around;
+      gap: 10px;
+    }
+    .status-options label {
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+<div class="diagram-container">
+  <img src="network.png" alt="Network Diagram" />
+  <div class="hotspot" style="top: 38%; left: 22.5%;" onclick="showLog('log1')" title="10.20.2.15"></div>
+  <div class="hotspot" style="top: 38%; left: 53.75%;" onclick="showLog('log2')" title="10.20.2.25"></div>
+  <div class="hotspot" style="top: 56.4%; left: 38%;" onclick="showLog('logFW')" title="Firewall"></div>
+  <div class="hotspot" style="top: 73%; left: 13.5%;" onclick="showLog('log3')" title="192.168.30.15"></div>
+  <div class="hotspot" style="top: 73%; left: 38.25%;" onclick="showLog('log4')" title="192.168.30.25"></div>
+  <div class="hotspot" style="top: 73%; left: 63%;" onclick="showLog('log5')" title="192.168.30.35"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="hideAllLogs()"></div>
+
+<!-- log1 -->
+<div id="log1" class="log-box">
+  <span class="close-btn" onclick="hideLog('log1')">✖</span>
+  <h3>Log: 10.20.2.15</h3>
+  <div class="log-output">
+6/2/2025 14:30  Info  Scheduled scan initiated
+6/2/2025 14:31  Info  Checking for update
+6/2/2025 14:32  Info  No update available
+6/2/2025 14:33  Info  Checking for definition update
+6/2/2025 14:34  Info  No definition update available
+6/2/2025 14:35  Info  Scan type = full
+6/2/2025 14:36  Info  Scan start
+6/2/2025 14:37  Info  Scanning system files
+6/2/2025 14:38  Info  Scanning temporary files
+6/2/2025 14:39  Info  Scanning services
+6/2/2025 14:40  Info  Scanning boot sector
+6/2/2025 14:41  Info  Scan complete
+6/2/2025 14:42  Info  Files removed: 0
+6/2/2025 14:43  Info  Files quarantined: 0
+6/2/2025 14:44  Info  Boot sector: clean
+6/2/2025 14:45  Info  Next scheduled scan: 6/3/2025 14:30
+6/3/2025 14:30  Info  Scheduled scan initiated
+6/3/2025 14:31  Info  Checking for update
+6/3/2025 14:32  Info  No update available
+6/3/2025 14:33  Info  Checking for definition update
+6/3/2025 14:34  Info  Update available v10.2.3.4440
+6/3/2025 14:35  Info  Downloading update
+6/3/2025 14:36  Info  Definition update complete
+6/3/2025 14:35  Info  Scan type = full
+6/3/2025 14:36  Info  Scan start
+6/3/2025 14:37  Info  Scanning system files
+6/3/2025 14:37  Warn  File found svch0st.exe match definition v10.2.3.4440
+6/3/2025 14:37  Warn  File quarantined svch0st.exe
+6/3/2025 14:38  Info  Scanning temporary files
+6/3/2025 14:39  Info  Scanning services
+6/3/2025 14:40  Info  Scanning boot sector
+6/3/2025 14:41  Info  Scan complete
+6/3/2025 14:42  Info  Files removed: 0
+6/3/2025 14:43  Info  Files quarantined: 1
+6/3/2025 14:44  Info  Boot sector: clean
+6/3/2025 14:45  Info  Next scheduled scan: 6/4/2025 14:30
+  </div>
+  <div class="status-options">
+    <label><input type="radio" name="status1" value="origin"> Origin</label>
+    <label><input type="radio" name="status1" value="infected"> Infected</label>
+    <label><input type="radio" name="status1" value="clean"> Clean</label>
+  </div>
+</div>
+
+<!-- log2 -->
+<div id="log2" class="log-box">
+  <span class="close-btn" onclick="hideLog('log2')">✖</span>
+  <h3>Log: 10.20.2.25</h3>
+  <div class="log-output">
+6/2/2025 14:30  Info  Scheduled scan initiated
+6/2/2025 14:31  Info  Checking for update
+6/2/2025 14:32  Info  No update available
+6/2/2025 14:33  Info  Checking for definition update
+6/2/2025 14:34  Info  No definition update available
+6/2/2025 14:35  Info  Scan type = full
+6/2/2025 14:36  Info  Scan start
+6/2/2025 14:37  Info  Scanning system files
+6/2/2025 14:38  Info  Scanning temporary files
+6/2/2025 14:39  Info  Scanning services
+6/2/2025 14:40  Info  Scanning boot sector
+6/2/2025 14:41  Info  Scan complete
+6/2/2025 14:42  Info  Files removed: 0
+6/2/2025 14:43  Info  Files quarantined: 0
+6/2/2025 14:44  Info  Boot sector: clean
+6/2/2025 14:45  Info  Next scheduled scan: 6/3/2025 14:30
+6/3/2025 14:30  Info  Scheduled scan initiated
+6/3/2025 14:31  Info  Checking for update
+6/3/2025 14:32  Info  No update available
+6/3/2025 14:33  Info  Checking for definition update
+6/3/2025 14:34  Error Unable to reach update server
+6/3/2025 14:35  Info  Scan type = full
+6/3/2025 14:36  Info  Scan start
+6/3/2025 14:37  Info  Scanning system files
+6/3/2025 14:37  Warn  File svch0st.exe match heuristic pattern 0c09488c08d0f3k
+6/3/2025 14:37  Error Unable to quarantine file svch0st.exe
+6/3/2025 14:38  Info  Scanning temporary files
+6/3/2025 14:39  Info  Scanning services
+6/3/2025 14:40  Info  Scanning boot sector
+6/3/2025 14:41  Info  Scan complete
+6/3/2025 14:42  Info  Files removed: 0
+6/3/2025 14:43  Info  Files quarantined: 0
+6/3/2025 14:43  Warn  File quarantine file
+6/3/2025 14:44  Info  Boot sector: clean
+6/3/2025 14:45  Info  Next scheduled scan: 6/4/2025 14:30
+  </div>
+  <div class="status-options">
+    <label><input type="radio" name="status2" value="origin"> Origin</label>
+    <label><input type="radio" name="status2" value="infected"> Infected</label>
+    <label><input type="radio" name="status2" value="clean"> Clean</label>
+  </div>
+</div>
+
+<!-- log3 -->
+<div id="log3" class="log-box">
+  <span class="close-btn" onclick="hideLog('log3')">✖</span>
+  <h3>Log: 192.168.30.15</h3>
+  <div class="log-output">
+6/2/2025 14:30  Info  Scheduled scan initiated
+6/2/2025 14:31  Info  Checking for update
+6/2/2025 14:32  Info  No update available
+6/2/2025 14:33  Info  Checking for definition update
+6/2/2025 14:34  Info  No definition update available
+6/2/2025 14:35  Info  Scan type = full
+6/2/2025 14:36  Info  Scan start
+6/2/2025 14:37  Info  Scanning system files
+6/2/2025 14:38  Info  Scanning temporary files
+6/2/2025 14:39  Info  Scanning services
+6/2/2025 14:40  Info  Scanning boot sector
+6/2/2025 14:41  Info  Scan complete
+6/2/2025 14:42  Info  Files removed: 0
+6/2/2025 14:43  Info  Files quarantined: 0
+6/2/2025 14:44  Info  Boot sector: clean
+6/2/2025 14:45  Info  Next scheduled scan: 6/3/2025 14:30
+6/3/2025 14:45   Warn  Scheduled scan disabled by process svch0st.exe
+6/3/2025 14:46   Warn  Scheduled update disabled by process svch0st.exe
+  </div>
+  <div class="status-options">
+    <label><input type="radio" name="status3" value="origin"> Origin</label>
+    <label><input type="radio" name="status3" value="infected"> Infected</label>
+    <label><input type="radio" name="status3" value="clean"> Clean</label>
+  </div>
+</div>
+
+<!-- log4 -->
+<div id="log4" class="log-box">
+  <span class="close-btn" onclick="hideLog('log4')">✖</span>
+  <h3>Log: 192.168.30.25</h3>
+  <div class="log-output">
+6/2/2025 14:30  Info  Scheduled scan initiated
+6/2/2025 14:31  Info  Checking for update
+6/2/2025 14:32  Info  No update available
+6/2/2025 14:33  Info  Checking for definition update
+6/2/2025 14:34  Info  No definition update available
+6/2/2025 14:35  Info  Scan type = full
+6/2/2025 14:36  Info  Scan start
+6/2/2025 14:37  Info  Scanning system files
+6/2/2025 14:38  Info  Scanning temporary files
+6/2/2025 14:39  Info  Scanning services
+6/2/2025 14:40  Info  Scanning boot sector
+6/2/2025 14:41  Info  Scan complete
+6/2/2025 14:42  Info  Files removed: 0
+6/2/2025 14:43  Info  Files quarantined: 0
+6/2/2025 14:44  Info  Boot sector: clean
+6/2/2025 14:45  Info  Next scheduled scan: 6/3/2025 14:30
+6/3/2025 14:30  Info  Scheduled scan initiated
+6/3/2025 14:31  Info  Checking for update
+6/3/2025 14:32  Info  No update available
+6/3/2025 14:33  Info  Checking for definition update
+6/3/2025 14:34  Info  Update available v10.2.3.4440
+6/3/2025 14:35  Info  Downloading update
+6/3/2025 14:36  Info  Definition update complete
+6/3/2025 14:35  Info  Scan type = full
+6/3/2025 14:36  Info  Scan start
+6/3/2025 14:37  Info  Scanning system files
+6/3/2025 14:37  Warn  File found svch0st.exe match definition v10.2.3.4440
+6/3/2025 14:37  Info  File quarantined svch0st.exe
+6/3/2025 14:38  Info  Scanning temporary files
+6/3/2025 14:39  Info  Scanning services
+6/3/2025 14:40  Info  Scanning boot sector
+6/3/2025 14:41  Info  Scan complete
+6/3/2025 14:42  Info  Files removed: 0
+6/3/2025 14:43  Info  Files quarantined: 1
+6/3/2025 14:44  Info  Boot sector: clean
+6/3/2025 14:45  Info  Next scheduled scan: 6/4/2025 14:30
+  </div>
+  <div class="status-options">
+    <label><input type="radio" name="status4" value="origin"> Origin</label>
+    <label><input type="radio" name="status4" value="infected"> Infected</label>
+    <label><input type="radio" name="status4" value="clean"> Clean</label>
+  </div>
+</div>
+
+<!-- log5 -->
+<div id="log5" class="log-box">
+  <span class="close-btn" onclick="hideLog('log5')">✖</span>
+  <h3>Log: 192.168.30.35</h3>
+  <div class="log-output">
+6/2/2025 14:30  Info  Scheduled scan initiated
+6/2/2025 14:31  Info  Checking for update
+6/2/2025 14:32  Info  No update available
+6/2/2025 14:33  Info  Checking for definition update
+6/2/2025 14:34  Info  No definition update available
+6/2/2025 14:35  Info  Scan type = full
+6/2/2025 14:36  Info  Scan start
+6/2/2025 14:37  Info  Scanning system files
+6/2/2025 14:38  Info  Scanning temporary files
+6/2/2025 14:39  Info  Scanning services
+6/2/2025 14:40  Info  Scanning boot sector
+6/2/2025 14:41  Info  Scan complete
+6/2/2025 14:42  Info  Files removed: 0
+6/2/2025 14:43  Info  Files quarantined: 0
+6/2/2025 14:44  Info  Boot sector: clean
+6/2/2025 14:45  Info  Next scheduled scan: 6/3/2025 14:30
+6/3/2025 14:30  Info  Scheduled scan initiated
+6/3/2025 14:31  Info  Checking for update
+6/3/2025 14:32  Info  No update available
+6/3/2025 14:33  Info  Checking for definition update
+6/3/2025 14:34  Error Unable to reach update server
+6/3/2025 14:35  Info  Scan type = full
+6/3/2025 14:36  Info  Scan start
+6/3/2025 14:37  Info  Scanning system files
+6/3/2025 14:37  Warn  File svch0st.exe match heuristic pattern 0c09488c08d0f3k
+6/3/2025 14:37  Error Unable to quarantine file svch0st.exe
+6/3/2025 14:38  Info  Scanning temporary files
+6/3/2025 14:39  Info  Scanning services
+6/3/2025 14:40  Info  Scanning boot sector
+6/3/2025 14:41  Info  Scan complete
+6/3/2025 14:42  Info  Files removed: 0
+6/3/2025 14:43  Info  Files quarantined: 0
+6/3/2025 14:43  Warn  File quarantine file
+6/3/2025 14:44  Info  Boot sector: clean
+6/3/2025 14:45  Info  Next scheduled scan: 6/4/2025 14:30
+  </div>
+  <div class="status-options">
+    <label><input type="radio" name="status5" value="origin"> Origin</label>
+    <label><input type="radio" name="status5" value="infected"> Infected</label>
+    <label><input type="radio" name="status5" value="clean"> Clean</label>
+  </div>
+</div>
+
+<!-- Firewall Log -->
+<div id="logFW" class="log-box">
+  <span class="close-btn" onclick="hideLog('logFW')">✖</span>
+  <h3>Firewall Log</h3>
+  <div class="log-output">
+Timestamp           Src.           Dest.          D/P   App.  Action Bytes(C/S)
+6/2/2025 16:01:44  10.20.2.25     57.203.54.183  443   ssl   Permit 6953/99427
+6/2/2025 16:01:58  192.168.30.25  57.203.54.221  443   ssl   Permit 9301/199386
+6/2/2025 16:17:06  192.168.30.15  10.20.2.15     135   rpc   Permit 175/1504
+6/2/2025 16:27:36  192.168.30.35  10.20.2.15     445   smbv1 Permit 345/34757
+6/2/2025 16:28:06  10.20.2.15     192.168.30.35  135   rpc   Permit 754/4771
+6/2/2025 16:28:16  10.20.2.25     192.168.30.15  135   rpc   Permit 643/2355
+6/2/2025 16:35:30  192.168.30.25  10.20.2.15     135   smbv2 Permit 649/5644
+6/2/2025 23:58:36  10.20.2.15     192.168.30.35        ICMP  Permit 128/128
+6/2/2025 23:58:36  10.20.2.15     192.168.30.15        ICMP  Permit 128/128
+6/2/2025 23:58:36  10.20.2.15     192.168.30.25        ICMP  Permit 128/128
+6/2/2025 23:58:45  10.20.2.25     192.168.30.35  445   smbv2 Permit 1874/23874
+6/3/2025 2:31:45   192.168.30.15  57.203.55.29   8080  http  Permit 7203/75997
+6/3/2025 2:31:51   10.20.2.25     57.203.56.201  443   ssl   Permit 9953/199730
+6/3/2025 2:31:02   192.168.30.25  57.203.55.234  443   ssl   Permit 4937/94937
+6/3/2025 2:32:02   192.168.30.35  57.203.55.29   8080  http  Permit 4937/84937
+6/3/2025 2:38:12   10.20.2.25     57.203.55.19   8080  ssl   Permit 1284/9102854
+6/3/2025 2:38:11   192.168.30.25  57.203.53.89   443   ssl   Permit  9341/9938
+6/3/2025 13:38:36  192.168.30.15  10.20.2.25     445   smbv3 Permit 1874/23874
+6/3/2025 13:38:43  192.168.30.15  10.20.2.25     135   rpc   Permit 673/41358
+6/3/2025 13:39:00  10.20.2.15     192.168.30.35  135   rpc   Permit 545/9063
+6/3/2025 13:39:14  10.20.2.25     192.168.30.15  445   smbv3 Permit 482/3505
+6/3/2025 13:52:57  192.168.30.25  10.20.2.15     135   rpc   Permit 876/8068
+6/3/2025 14:00:04  10.20.2.15     57.203.56.231  443   ssl   Permit 9901/199730
+6/3/2025 14:30:04  192.168.30.25  57.203.56.143  443   ssl   Permit 10092/209938
+  </div>
+</div>
+
+<script>
+  function showLog(id) {
+    document.getElementById(id).style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+  }
+  function hideLog(id) {
+    document.getElementById(id).style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+  }
+  function hideAllLogs() {
+    ['log1','log2','log3','log4','log5','logFW'].forEach(id => {
+      document.getElementById(id).style.display = 'none';
+    });
+    document.getElementById('overlay').style.display = 'none';
+  }
+</script>
+<script>
+  // Existing functions remain the same...
+
+  // Make dialog boxes draggable
+  const dragElements = document.querySelectorAll('.log-box');
+
+  dragElements.forEach(el => {
+    const header = el.querySelector("h3");
+    let isDragging = false, offsetX, offsetY;
+
+    header.addEventListener("mousedown", e => {
+      isDragging = true;
+      offsetX = e.clientX - el.offsetLeft;
+      offsetY = e.clientY - el.offsetTop;
+      el.style.position = "absolute";
+      el.style.zIndex = 10000;
+    });
+
+    document.addEventListener("mousemove", e => {
+      if (isDragging) {
+        el.style.left = `${e.clientX - offsetX}px`;
+        el.style.top = `${e.clientY - offsetY}px`;
+      }
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+  });
+</script>
+
+<!-- Submit & Reset Buttons -->
+<div style="margin-top: 30px;">
+  <button onclick="submitAnswers()">Submit</button>
+  <button onclick="resetAnswers()">Reset</button>
+</div>
+
+<!-- Score Dialog -->
+<div id="scoreDialog" class="log-box" style="display:none;">
+  <span class="close-btn" onclick="document.getElementById('scoreDialog').style.display='none'; document.getElementById('overlay').style.display='none';">✖</span>
+  <h3>Score</h3>
+  <div class="log-output" id="scoreOutput" style="white-space: pre-wrap;"></div>
+</div>
+
+<script>
+function getRadioValue(name) {
+  const radios = document.getElementsByName(name);
+  for (let r of radios) if (r.checked) return r.value;
+  return "";
+}
+
+function submitAnswers() {
+  const correct = {
+    status1: "clean",     // 10.20.2.15
+    status2: "origin",       // 10.20.2.25
+    status3: "infected",     // 192.168.30.15
+    status4: "clean",        // 192.168.30.25
+    status5: "infected"      // 192.168.30.35
+  };
+
+  const feedback = {
+    status1: "10.20.2.15 - Clean: svch0st.exe was detected and successfully quarantined. No further issues reported.",
+    status2: "10.20.2.25 - Origin: Detected svch0st.exe, but failed to quarantine it. Appears in the firewall logs as a source initiating multiple connections. The failure to quarantine and high communication activity makes it the most likely origin.",
+    status3: "192.168.30.15 - Infected: Logs show svch0st.exe disabled scheduled scans and updates, which is characteristic of malware. Also connects externally and to internal systems in the firewall logs.",
+    status4: "192.168.30.25 - Clean: svch0st.exe was detected and successfully quarantined. No further issues reported.",
+    status5: "192.168.30.35 - Infected: Heuristic detection of svch0st.exe, but unable to quarantine it. Also seen reaching out externally."
+  };
+
+  let score = 0;
+  let total = 5;
+  let result = "";
+  let allCorrect = true;
+
+  for (let key in correct) {
+    const userAnswer = getRadioValue(key);
+    if (userAnswer === correct[key]) {
+      score++;
+    } else {
+      allCorrect = false;
+    }
+  }
+
+  if (allCorrect) {
+    result += `✅ All correct! Score: ${score}/${total}`;
+  } else {
+    result += `❌ Score: ${score}/${total}
+
+Incorrect Diagnoses:
+
+`;
+    for (let key in correct) {
+      const userAnswer = getRadioValue(key);
+      if (userAnswer !== correct[key]) {
+        result += `• ${feedback[key]}
+
+`;
+      }
+    }
+  }
+
+  document.getElementById('scoreOutput').textContent = result.trim();
+  document.getElementById('scoreDialog').style.display = 'block';
+  document.getElementById('overlay').style.display = 'block';
+}
+
+function resetAnswers() {
+  for (let i = 1; i <= 5; i++) {
+    const radios = document.getElementsByName('status' + i);
+    for (let r of radios) r.checked = false;
+  }
+  document.getElementById('scoreDialog').style.display = 'none';
+  document.getElementById('overlay').style.display = 'none';
+}
+</script>
+
+</body>
+</html>

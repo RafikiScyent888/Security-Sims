@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Security+ PBQ — Automated SSH Keys (RSA) Order</title>
+  <style>
+    :root{
+      --bg:#071425;
+      --text:#e7eefc;
+      --muted:#b9c7e6;
+      --accent:#3ea6ff;
+      --good:#22c55e;
+      --bad:#ef4444;
+      --warn:#f59e0b;
+      --border:rgba(255,255,255,.10);
+      --shadow:0 18px 50px rgba(0,0,0,.35);
+      --radius:16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background: radial-gradient(900px 600px at 20% 10%, rgba(62,166,255,.14), transparent 60%),
+                  radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.10), transparent 60%),
+                  radial-gradient(900px 700px at 50% 90%, rgba(245,158,11,.08), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .wrap{width:min(1050px, 100%);}
+    .title{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border:1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding:16px 18px;
+      margin-bottom:16px;
+    }
+    h1{font-size:18px; margin:0 0 6px;}
+    .subtitle{margin:0; color:var(--muted); font-size:13px; line-height:1.35;}
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      gap:12px;
+      background: rgba(0,0,0,.12);
+      flex-wrap:wrap;
+    }
+    .score{
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid var(--border);
+      border-radius: 12px;
+      padding:8px 10px;
+      background: rgba(255,255,255,.04);
+      white-space:nowrap;
+    }
+    .content{padding:18px 16px 16px;}
+    .scenario{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      border-radius: 14px;
+      padding:12px 12px;
+      margin-bottom:14px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr;}
+    }
+    .col{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      border-radius: 14px;
+      padding:12px;
+    }
+    .col h2{
+      margin:0 0 8px;
+      font-size:14px;
+      color:rgba(231,238,252,.95);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .small{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+      margin:0 0 10px;
+    }
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height:160px;
+      padding:10px;
+      border-radius: 12px;
+      border:1px dashed rgba(255,255,255,.16);
+      background: rgba(0,0,0,.12);
+    }
+    .slot{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      border-radius: 12px;
+      padding:10px 10px;
+      min-height:48px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .slot .num{
+      width:30px;
+      height:30px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      display:grid;
+      place-items:center;
+      font-family:var(--mono);
+      color:rgba(231,238,252,.9);
+      flex:0 0 auto;
+    }
+    .card{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      border-radius: 12px;
+      padding:10px 10px;
+      cursor:grab;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      user-select:none;
+    }
+    .card:active{cursor:grabbing;}
+    .tag{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color:rgba(231,238,252,.88);
+      flex:0 0 auto;
+      margin-top:1px;
+    }
+    .cmd{
+      font-family:var(--mono);
+      font-size:13px;
+      line-height:1.35;
+      color:rgba(231,238,252,.95);
+      word-break:break-word;
+    }
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+    button{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:600;
+      letter-spacing:.2px;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+    }
+    button:hover{transform: translateY(-1px); background: rgba(255,255,255,.09);}
+    button:disabled{opacity:.45; cursor:not-allowed; transform:none;}
+    .primary{
+      border-color: rgba(62,166,255,.55);
+      background: rgba(62,166,255,.12);
+    }
+    .primary:hover{background: rgba(62,166,255,.16);}
+    .ghost{background: transparent;}
+    .feedback{
+      margin-top:14px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      padding:12px 12px;
+      display:none;
+    }
+    .feedback.show{display:block;}
+    .pill{
+      display:inline-block;
+      font-family:var(--mono);
+      font-size:12px;
+      padding:6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      margin-right:8px;
+      margin-bottom:8px;
+      white-space:nowrap;
+    }
+    .pill.good{border-color: rgba(34,197,94,.45); color: rgba(34,197,94,.95);}
+    .pill.bad{border-color: rgba(239,68,68,.45); color: rgba(239,68,68,.95);}
+    .pill.warn{border-color: rgba(245,158,11,.45); color: rgba(245,158,11,.95);}
+    details{
+      margin-top:10px;
+      border:1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(0,0,0,.10);
+      padding:10px 12px;
+    }
+    summary{cursor:pointer; color:var(--accent); font-weight:600; outline:none;}
+    .explain{margin-top:8px; color:var(--muted); font-size:13px; line-height:1.45;}
+    .dropHint{
+      font-size:12px;
+      color:var(--muted);
+      font-family:var(--mono);
+    }
+    .slot.over{outline:2px solid rgba(62,166,255,.35);}
+    .card.locked{cursor:not-allowed; opacity:.92;}
+    .slot.correct{border-color: rgba(34,197,94,.45); background: rgba(34,197,94,.08);}
+    .slot.wrong{border-color: rgba(239,68,68,.45); background: rgba(239,68,68,.08);}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">
+      <h1>Security+ PBQ — Automated SSH Keys (RSA): Put Operations in the Correct Order</h1>
+      <p class="subtitle">
+        Drag items into the ordered steps to implement automated SSH key authentication with minimal commands, then verify it works.
+        Includes common trap choices. (Based on your attached PBQ memory jog.)
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="topbar">
+        <div style="color:var(--muted); font-size:12px;">
+          Drag & Drop Ordering PBQ • Steps required: <span style="font-family:var(--mono);">4</span>
+        </div>
+        <div class="score" id="scoreBox">Score: —</div>
+      </div>
+
+      <div class="content">
+        <div class="scenario">
+          <strong>Scenario:</strong> A server technician must configure SSH key authentication for a user on a Linux server using minimal commands
+          and verify it works. You are given a list of operations/commands. Drag the correct operations into the ordered steps below.
+          <div style="margin-top:8px;" class="dropHint">Tip: Some options are traps and should be left unused.</div>
+        </div>
+
+        <div class="grid">
+          <div class="col">
+            <h2>
+              Step Order (drop here)
+              <span class="dropHint">1 → 4</span>
+            </h2>
+            <p class="small">
+              Build the smallest correct sequence to create a key pair, install the public key, verify login, and confirm key placement.
+            </p>
+
+            <div class="list" id="ordered">
+              <div class="slot" data-slot="1"><div class="num">1</div><div class="cmd" data-holder>Drop an item here</div></div>
+              <div class="slot" data-slot="2"><div class="num">2</div><div class="cmd" data-holder>Drop an item here</div></div>
+              <div class="slot" data-slot="3"><div class="num">3</div><div class="cmd" data-holder>Drop an item here</div></div>
+              <div class="slot" data-slot="4"><div class="num">4</div><div class="cmd" data-holder>Drop an item here</div></div>
+            </div>
+
+            <div class="controls">
+              <button class="primary" id="submitBtn">Submit PBQ</button>
+              <button class="ghost" id="resetBtn">Reset</button>
+            </div>
+
+            <div class="feedback" id="feedback">
+              <div id="pillRow"></div>
+              <details>
+                <summary>Answer Key + Explanations (click to expand)</summary>
+                <div class="explain" id="explain"></div>
+              </details>
+            </div>
+          </div>
+
+          <div class="col">
+            <h2>Choice List (drag these)</h2>
+            <p class="small">
+              You may leave unused items in this list. Traps exist (permissions and root login).
+            </p>
+
+            <div class="list" id="pool" aria-label="Choice pool"></div>
+
+            <div class="small" style="margin-top:10px;">
+              <strong>Security+ concept check:</strong> SSH key auth requires a private key client-side and the matching public key
+              installed in <span style="font-family:var(--mono);">~/.ssh/authorized_keys</span> server-side, with restrictive permissions.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ===== PBQ data based on the attached PDF (choice list + likely correct order + traps)
+  const ITEMS = [
+    { id:"ssh-keygen", label:"Command", text:"ssh-keygen" },
+    { id:"openssl-inspect", label:"Command", text:"openssl rsa -pubin -in ~/.ssh/id_rsa.pub -text -noout" },
+    { id:"ssh-copy-id-i", label:"Command", text:"ssh-copy-id -i ~/.ssh/id_rsa.pub user@server" },
+    { id:"ssh-copy-id", label:"Command", text:"ssh-copy-id user@server" },
+    { id:"ssh-i", label:"Command", text:"ssh -i ~/.ssh/id_rsa user@server" },
+    { id:"authorized_keys", label:"File", text:"~/.ssh/authorized_keys" },
+    { id:"ssh-root", label:"Command", text:"ssh root@server" },
+    { id:"chmod-777", label:"Command", text:"chmod 777 something" },
+  ];
+
+  // Minimal correct implementation + verification from the PDF:
+  // 1 ssh-keygen
+  // 2 ssh-copy-id -i ~/.ssh/id_rsa.pub user@server (or ssh-copy-id user@server)
+  // 3 ssh -i ~/.ssh/id_rsa user@server
+  // 4 ~/.ssh/authorized_keys (confirm key installed)
+  //
+  // We'll accept either ssh-copy-id variant for step 2.
+  const ACCEPTED = {
+    1: ["ssh-keygen"],
+    2: ["ssh-copy-id-i", "ssh-copy-id"],
+    3: ["ssh-i"],
+    4: ["authorized_keys"]
+  };
+
+  const TRAPS = new Set(["ssh-root","chmod-777"]);
+  const OPTIONAL = new Set(["openssl-inspect"]);
+
+  // ===== Drag/drop state
+  const pool = document.getElementById("pool");
+  const ordered = document.getElementById("ordered");
+  const submitBtn = document.getElementById("submitBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const scoreBox = document.getElementById("scoreBox");
+  const feedback = document.getElementById("feedback");
+  const pillRow = document.getElementById("pillRow");
+  const explain = document.getElementById("explain");
+
+  let locked = false;
+
+  function makeCard(item){
+    const div = document.createElement("div");
+    div.className = "card";
+    div.draggable = true;
+    div.dataset.id = item.id;
+
+    const tag = document.createElement("div");
+    tag.className = "tag";
+    tag.textContent = item.label;
+
+    const cmd = document.createElement("div");
+    cmd.className = "cmd";
+    cmd.textContent = item.text;
+
+    div.appendChild(tag);
+    div.appendChild(cmd);
+
+    div.addEventListener("dragstart", (e) => {
+      if (locked) { e.preventDefault(); return; }
+      e.dataTransfer.setData("text/plain", item.id);
+      e.dataTransfer.effectAllowed = "move";
+    });
+
+    return div;
+  }
+
+  function init(){
+    // Fill pool with shuffled items each load for realism
+    const shuffled = ITEMS.slice().sort(() => Math.random() - 0.5);
+    pool.innerHTML = "";
+    shuffled.forEach(it => pool.appendChild(makeCard(it)));
+
+    // Reset slots
+    const slots = ordered.querySelectorAll(".slot");
+    slots.forEach(slot => {
+      slot.classList.remove("correct","wrong");
+      slot.innerHTML = `<div class="num">${slot.dataset.slot}</div><div class="cmd" data-holder>Drop an item here</div>`;
+    });
+
+    // Clear feedback
+    scoreBox.textContent = "Score: —";
+    feedback.classList.remove("show");
+    pillRow.innerHTML = "";
+    explain.innerHTML = "";
+
+    locked = false;
+    submitBtn.disabled = false;
+    // unlock cards
+    Array.from(document.querySelectorAll(".card")).forEach(c => c.classList.remove("locked"));
+  }
+
+  function allowDropOn(el){
+    el.addEventListener("dragover", (e) => {
+      if (locked) return;
+      e.preventDefault();
+      el.classList.add("over");
+      e.dataTransfer.dropEffect = "move";
+    });
+    el.addEventListener("dragleave", () => el.classList.remove("over"));
+    el.addEventListener("drop", (e) => {
+      if (locked) return;
+      e.preventDefault();
+      el.classList.remove("over");
+      const id = e.dataTransfer.getData("text/plain");
+      if (!id) return;
+
+      const card = document.querySelector(`.card[data-id="${CSS.escape(id)}"]`);
+      if (!card) return;
+
+      // If dropping onto a slot, replace existing item back to pool
+      if (el.classList.contains("slot")){
+        const existing = el.querySelector(".card");
+        if (existing){
+          pool.appendChild(existing);
+        }
+        el.innerHTML = `<div class="num">${el.dataset.slot}</div>`;
+        el.appendChild(card);
+      } else {
+        // dropping to pool just appends
+        pool.appendChild(card);
+      }
+    });
+  }
+
+  // Enable drop targets
+  function setupDropTargets(){
+    // pool itself
+    allowDropOn(pool);
+    // each slot
+    ordered.querySelectorAll(".slot").forEach(slot => allowDropOn(slot));
+  }
+
+  function getSelection(){
+    const out = {};
+    ordered.querySelectorAll(".slot").forEach(slot => {
+      const n = Number(slot.dataset.slot);
+      const card = slot.querySelector(".card");
+      out[n] = card ? card.dataset.id : null;
+    });
+    return out;
+  }
+
+  function submit(){
+    const sel = getSelection();
+    let score = 0;
+
+    // Validate: each step correct
+    ordered.querySelectorAll(".slot").forEach(slot => {
+      const n = Number(slot.dataset.slot);
+      const chosen = sel[n];
+
+      const ok = chosen && (ACCEPTED[n] || []).includes(chosen);
+      if (ok) score++;
+
+      slot.classList.remove("correct","wrong");
+      slot.classList.add(ok ? "correct" : "wrong");
+    });
+
+    // End feedback
+    const total = 4;
+    scoreBox.textContent = `Score: ${score} / ${total}`;
+    feedback.classList.add("show");
+
+    pillRow.innerHTML = "";
+    const pill = document.createElement("span");
+    pill.className = "pill " + (score === total ? "good" : "bad");
+    pill.textContent = (score === total) ? "PBQ Result: Pass" : "PBQ Result: Needs Review";
+    pillRow.appendChild(pill);
+
+    // Show notes about traps left unused
+    const poolIds = Array.from(pool.querySelectorAll(".card")).map(c => c.dataset.id);
+    const usedIds = Object.values(sel).filter(Boolean);
+    const unused = poolIds.concat([]); // already unused
+    const includedTraps = usedIds.filter(x => TRAPS.has(x));
+    const includedOptional = usedIds.filter(x => OPTIONAL.has(x));
+
+    const trapPill = document.createElement("span");
+    trapPill.className = "pill " + (includedTraps.length ? "bad" : "good");
+    trapPill.textContent = includedTraps.length ? `Trap Used: ${includedTraps.join(", ")}` : "Traps: None Used";
+    pillRow.appendChild(trapPill);
+
+    const optPill = document.createElement("span");
+    optPill.className = "pill " + (includedOptional.length ? "warn" : "good");
+    optPill.textContent = includedOptional.length ? "Optional: RSA key inspection included" : "Optional: Not included";
+    pillRow.appendChild(optPill);
+
+    // Explain section
+    explain.innerHTML = `
+      <div><strong>Accepted correct order (minimal + verification):</strong></div>
+      <ol>
+        <li><span style="font-family:var(--mono);">ssh-keygen</span> — generate the keypair client-side.</li>
+        <li><span style="font-family:var(--mono);">ssh-copy-id -i ~/.ssh/id_rsa.pub user@server</span> (or <span style="font-family:var(--mono);">ssh-copy-id user@server</span>) — install the public key on the server.</li>
+        <li><span style="font-family:var(--mono);">ssh -i ~/.ssh/id_rsa user@server</span> — verify key-based login works.</li>
+        <li><span style="font-family:var(--mono);">~/.ssh/authorized_keys</span> — confirm the key was placed on the server in the correct file.</li>
+      </ol>
+      <div style="margin-top:10px;"><strong>Optional verification step:</strong></div>
+      <div style="color:var(--muted);">
+        <span style="font-family:var(--mono);">openssl rsa -pubin -in ~/.ssh/id_rsa.pub -text -noout</span> inspects the public key contents. It does not install the key.
+      </div>
+      <div style="margin-top:10px;"><strong>Common trap rationale:</strong></div>
+      <ul style="color:var(--muted);">
+        <li><span style="font-family:var(--mono);">ssh root@server</span> is usually unnecessary for installing a user’s key unless the PBQ explicitly requires server-wide SSH configuration changes.</li>
+        <li><span style="font-family:var(--mono);">chmod 777 something</span> is typically incorrect for SSH keys. SSH requires restrictive permissions (commonly <span style="font-family:var(--mono);">~/.ssh</span> 700 and <span style="font-family:var(--mono);">authorized_keys</span> 600).</li>
+      </ul>
+    `;
+
+    // lock interaction
+    locked = true;
+    submitBtn.disabled = true;
+    Array.from(document.querySelectorAll(".card")).forEach(c => c.classList.add("locked"));
+  }
+
+  submitBtn.addEventListener("click", submit);
+  resetBtn.addEventListener("click", init);
+
+  setupDropTargets();
+  init();
+</script>
+</body>
+</html>

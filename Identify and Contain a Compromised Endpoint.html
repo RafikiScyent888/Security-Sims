@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Review Threat Intelligence and Mitigate Host Activity</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body { font-family: Arial, sans-serif; background:#f4f6fb; margin:0; }
+.container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+h1 { font-size: 22px; margin-bottom: 6px; }
+.sub { color:#444; margin-bottom: 18px; }
+
+.grid { display:grid; grid-template-columns: 1fr 1.2fr; gap:16px; }
+.card { background:#fff; border:1px solid #ddd; border-radius:12px; }
+.card h2 { margin:0; padding:12px 14px; font-size:16px; border-bottom:1px solid #eee; }
+.card .content { padding:14px; }
+
+pre { white-space: pre-wrap; font-size:13px; line-height:1.4; }
+
+.terminal {
+  background:#0b1020;
+  color:#e7e9f0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  padding: 12px;
+  height: 360px;
+  overflow-y: auto;
+  border-radius: 10px;
+}
+
+.prompt { color:#9bdcff; }
+input[type="text"] {
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border-radius:8px;
+  border:1px solid #ddd;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+select, button {
+  padding:8px;
+  margin-top:8px;
+  width:100%;
+}
+
+button.primary {
+  background:#2f5cff;
+  color:#fff;
+  border:1px solid #2f5cff;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.result { margin-top:12px; font-weight:bold; }
+.correct { color:green; }
+.incorrect { color:red; }
+
+.explanation {
+  margin-top:16px;
+  padding:14px;
+  border-radius:10px;
+  background:#f9fafc;
+  border:1px solid #ddd;
+  display:none;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>Review Threat Intelligence and Mitigate Host Activity</h1>
+<p class="sub">Review the scenario and use the available tools to investigate and mitigate the issue.</p>
+
+<div class="grid">
+
+<!-- Scenario -->
+<div class="card">
+<h2>Scenario</h2>
+<div class="content">
+<pre>
+An organization’s security team has received multiple alerts related to a workstation
+within the internal network.
+
+Threat intelligence indicates that a recently identified threat actor is using
+unauthorized background processes to establish outbound connections to external
+systems.
+
+Network monitoring tools have flagged repeated outbound communication from the
+affected host to an unfamiliar external IP address over a non-standard port.
+
+You have been provided limited access to the system to investigate the activity.
+Use the available tools to identify the source of the suspicious behavior and
+implement the most appropriate mitigation.
+</pre>
+</div>
+</div>
+
+<!-- Terminal -->
+<div class="card">
+<h2>Command Line Interface</h2>
+<div class="content">
+<div id="terminal" class="terminal"></div>
+<input id="cmd" type="text"
+placeholder="Type a command (help, netstat, ls -l, rm <pid>)"
+onkeydown="if(event.key==='Enter'){runCmd()}">
+</div>
+</div>
+
+</div>
+
+<!-- Identification Section -->
+<div class="card" style="margin-top:16px;">
+<h2>Identify the Issue and Apply the Fix</h2>
+<div class="content">
+
+<label>Identified Threat:</label>
+<select id="threat">
+  <option value="">-- Select --</option>
+  <option>Outdated operating system</option>
+  <option>Misconfigured firewall rules</option>
+  <option>Unauthorized background process</option>
+  <option>Credential reuse</option>
+</select>
+
+<label>Mitigation Action:</label>
+<select id="fix">
+  <option value="">-- Select --</option>
+  <option>Apply system patches</option>
+  <option>Reset user credentials</option>
+  <option>Terminate malicious process</option>
+  <option>Disable unused services</option>
+</select>
+
+<button class="primary" onclick="grade()">Submit</button>
+<p id="result" class="result"></p>
+
+<div id="explanation" class="explanation"></div>
+
+</div>
+</div>
+
+</div>
+
+<script>
+let malwareRunning = true;
+const maliciousPID = "4472";
+const terminal = document.getElementById("terminal");
+
+function print(line="") {
+  terminal.innerHTML += line + "<br>";
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+print("Security+ Simulated CLI");
+print("Type 'help' to view available commands.");
+print("");
+
+function runCmd() {
+  const input = document.getElementById("cmd");
+  const cmd = input.value.trim();
+  input.value = "";
+
+  print(`<span class="prompt">$</span> ${cmd}`);
+
+  if (cmd === "help") {
+    print("Available commands:");
+    print("  netstat    Display network connections");
+    print("  ls -l      List directory contents");
+    print("  rm <pid>   Terminate a running process");
+    print("");
+  }
+
+  else if (cmd === "netstat") {
+    print("Proto  Local Address        Foreign Address       State        PID");
+    if (malwareRunning) {
+      print("tcp    10.0.0.5:22          10.0.0.10:54122        ESTABLISHED  1120");
+      print("tcp    10.0.0.5:443         34.221.19.8:443        ESTABLISHED  2214");
+      print("tcp    10.0.0.5:49632       185.71.66.12:4444      ESTABLISHED  4472  <--");
+      print("udp    10.0.0.5:68          255.255.255.255:67    LISTENING    980");
+    } else {
+      print("tcp    10.0.0.5:22          10.0.0.10:54122        ESTABLISHED  1120");
+      print("tcp    10.0.0.5:443         34.221.19.8:443        ESTABLISHED  2214");
+      print("udp    10.0.0.5:68          255.255.255.255:67    LISTENING    980");
+    }
+    print("");
+  }
+
+  else if (cmd === "ls -l") {
+    print("Permissions   Owner  Size    File");
+    if (malwareRunning) {
+      print("-rw-r--r--    root   4096    system.log");
+      print("-rwxr-xr-x    root   8192    updater.sh");
+      print("-rwxrwxrwx    root   20480   nightbeacon.sh  <--");
+    } else {
+      print("-rw-r--r--    root   4096    system.log");
+      print("-rwxr-xr-x    root   8192    updater.sh");
+    }
+    print("");
+  }
+
+  else if (cmd.startsWith("rm")) {
+    if (cmd.includes(maliciousPID) && malwareRunning) {
+      malwareRunning = false;
+      print(`Process ${maliciousPID} terminated successfully.`);
+      print("Suspicious outbound connections closed.");
+      print("");
+    } else {
+      print("Error: Invalid or non-running PID.");
+      print("");
+    }
+  }
+
+  else {
+    print("Command not recognized. Type 'help' for assistance.");
+    print("");
+  }
+}
+
+function grade() {
+  const threat = document.getElementById("threat").value;
+  const fix = document.getElementById("fix").value;
+  const result = document.getElementById("result");
+  const explanation = document.getElementById("explanation");
+
+  explanation.style.display = "block";
+
+  if (threat === "Unauthorized background process" &&
+      fix === "Terminate malicious process" &&
+      malwareRunning === false) {
+
+    result.innerHTML = "<span class='correct'>Correct — the threat was identified and properly mitigated.</span>";
+
+    explanation.innerHTML = `
+<b>Why PID 4472 was the issue:</b><br>
+The <code>netstat</code> output showed PID 4472 maintaining a persistent outbound
+connection to an unfamiliar external IP address over a high, non-standard port.
+This behavior is consistent with unauthorized background activity rather than
+legitimate user-initiated traffic.<br><br>
+
+<b>Why nightbeacon.sh was suspicious:</b><br>
+The <code>ls -l</code> output revealed a file with world-writable permissions (777),
+which violates the principle of least privilege. Legitimate system scripts do not
+require unrestricted permissions, making this file a strong indicator of compromise.<br><br>
+
+<b>Why terminating the process was the correct mitigation:</b><br>
+The scenario required immediate containment. Terminating the malicious process
+stopped the unauthorized outbound communication, preventing further command
+execution or data exfiltration. This aligns with incident response containment
+procedures tested on the Security+ exam.
+`;
+  } else {
+    result.innerHTML = "<span class='incorrect'>Incorrect or incomplete response.</span>";
+
+    explanation.innerHTML = `
+<b>Explanation:</b><br>
+The suspicious activity originated from an unauthorized background process.
+Key indicators included persistent outbound connections to an unfamiliar external
+IP address and the presence of an improperly permissioned executable file.
+The most appropriate mitigation was to terminate the malicious process to contain
+the activity.
+`;
+  }
+}
+</script>
+
+</body>
+</html>

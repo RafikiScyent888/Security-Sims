@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Site-to-Site VPN Configuration</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f9f9f9; }
+    #container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h1 { text-align: center; margin-bottom: 10px; }
+    .instructions { text-align: center; color: #333; font-size: 0.95em; white-space: pre-wrap; margin-bottom: 20px; }
+    .diagram { text-align: center; margin-bottom: 20px; }
+    .diagram svg { max-width: 100%; height: auto; }
+    .section-title { font-size: 1.2em; font-weight: bold; margin: 20px 0; text-align: center; }
+    .row { display: flex; align-items: center; margin: 8px 0; }
+    .row label { width: 200px; flex-shrink: 0; }
+    .row select, .row span { flex-grow: 1; padding: 4px; }
+    .nav-buttons { margin-top: 20px; text-align: center; }
+    .nav-buttons button { margin: 0 10px; padding: 8px 12px; }
+    .global-actions { text-align: center; margin-top: 30px; }
+    .global-actions button { margin: 0 10px; padding: 10px 16px; }
+    .clickable { cursor: pointer; }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    .modal-content {
+      background-color: #e1f5fe;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 700px;
+      position: relative;
+    }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    #drag-handle {
+      background: #0288d1;
+      color: white;
+      padding: 10px;
+      cursor: move;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      font-weight: bold;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <h1>Site-to-Site VPN Configuration</h1>
+    <div class="instructions">
+      In this task, you are responsible for setting up a site-to-site VPN to securely connect two remote networks.
+      The configuration must use the most secure encryption algorithms available to ensure confidentiality and integrity of the data.
+      All traffic between the two sites should be fully encrypted over the VPN tunnel.
+      Additionally, authentication between the VPN concentrators must be established using a shared secret password to ensure that only trusted devices can form the connection.
+    </div>
+    <div class="diagram">
+      <svg viewBox="0 0 960 180" width="100%" height="300" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#444" />
+          </marker>
+        </defs>
+        <polygon points="240,30 290,0 340,30" fill="#b0bec5" stroke="#444" />
+        <rect x="240" y="30" width="100" height="50" fill="#e3f2fd" stroke="#444" />
+        <text x="290" y="55" text-anchor="middle" font-size="12">Columbus Site</text>
+        <text x="290" y="68" text-anchor="middle" font-size="10">192.168.1.0/24</text>
+        <line x1="290" y1="80" x2="290" y2="100" stroke="#444" stroke-width="2" marker-end="url(#arrow)" />
+        <g id="vpn1" class="clickable" onclick="selectVPN('VPN Concentrator 1')">
+          <rect x="240" y="100" width="100" height="60" fill="#c8e6c9" stroke="#444" />
+          <text x="290" y="130" text-anchor="middle" font-size="12">VPN1</text>
+          <text x="290" y="145" text-anchor="middle" font-size="10">5.5.5.10/24</text>
+        </g>
+        <line x1="340" y1="130" x2="620" y2="130" stroke="#444" stroke-dasharray="5,5" />
+        <circle cx="475" cy="130" r="20" fill="#fff3e0" stroke="#444" />
+        <circle cx="455" cy="125" r="20" fill="#fff3e0" stroke="#444" />
+        <circle cx="495" cy="125" r="20" fill="#fff3e0" stroke="#444" />
+        <circle cx="475" cy="115" r="20" fill="#fff3e0" stroke="#444" />
+        <g id="vpn2" class="clickable" onclick="selectVPN('VPN Concentrator 2')">
+          <rect x="625" y="100" width="100" height="60" fill="#c8e6c9" stroke="#444" />
+          <text x="675" y="130" text-anchor="middle" font-size="12">VPN2</text>
+          <text x="675" y="145" text-anchor="middle" font-size="10">5.5.5.20/24</text>
+        </g>
+        <line x1="675" y1="80" x2="675" y2="100" stroke="#444" stroke-width="2" marker-end="url(#arrow)" />
+        <polygon points="625,30 675,0 725,30" fill="#b0bec5" stroke="#444" />
+        <rect x="625" y="30" width="100" height="50" fill="#e3f2fd" stroke="#444" />
+        <text x="675" y="55" text-anchor="middle" font-size="12">Dallas Site</text>
+        <text x="675" y="68" text-anchor="middle" font-size="10">192.168.2.0/24</text>
+      </svg>
+    </div>
+    <div class="global-actions">
+      <button id="submitAll">Submit</button>
+      <button id="resetAll">Reset</button>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="vpnModal" class="modal">
+    <div id="vpnModalContent" class="modal-content">
+      <div id="drag-handle">Drag Here</div>
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div id="dynamic-form"></div>
+    </div>
+  </div>
+
+  <script>
+    const vpnData = {
+      "VPN Concentrator 1": {
+        phase1: {
+          "Peer IP": ["5.5.5.20/24", ["192.168.1.0/24", "5.5.5.20/24", "192.168.2.0/24", "5.5.5.10/24"]],
+          "Auth Method": ["PSK", ["PSK", "RADIUS", "Enterprise"]],
+          "Negotiation Mode": ["Main", null],
+          "Encryption Algorithm": ["AES 256", ["Blowfish", "3DES", "AES 256", "DES"]],
+          "Hash Algorithm": ["SHA 256", ["SHA1", "SHA 256", "MD5"]],
+          "DH Key Group": ["14", null]
+        },
+        phase2: {
+          "Mode": ["Tunnel", null],
+          "Protocol": ["ESP", ["ESP", "AH"]],
+          "Encryption Algorithm": ["AES 256", ["AES 256", "Blowfish", "3DES", "DES"]],
+          "Hash Algorithm": ["SHA 256", ["SHA1", "MD5", "SHA 256"]],
+          "Local Net/Mask": ["192.168.1.0/24", ["192.168.1.0/24", "5.5.5.10/24", "192.168.2.0/24", "5.5.5.20/24"]],
+          "Remote Net/Mask": ["192.168.2.0/24", ["192.168.1.0/24", "5.5.5.10/24", "192.168.2.0/24", "5.5.5.20/24"]]
+        }
+      },
+      "VPN Concentrator 2": {
+        phase1: {
+          "Peer IP": ["5.5.5.10/24", ["5.5.5.10/24", "192.168.1.0/24", "5.5.5.20/24", "192.168.2.0/24"]],
+          "Auth Method": ["PSK", ["PSK", "RADIUS", "Enterprise"]],
+          "Negotiation Mode": ["Main", null],
+          "Encryption Algorithm": ["AES 256", ["AES 256", "Blowfish", "3DES", "DES"]],
+          "Hash Algorithm": ["SHA 256", ["SHA 256", "SHA1", "MD5"]],
+          "DH Key Group": ["14", null]
+        },
+        phase2: {
+          "Mode": ["Tunnel", null],
+          "Protocol": ["ESP", ["ESP", "AH"]],
+          "Encryption Algorithm": ["AES 256", ["AES 256", "Blowfish", "3DES", "DES"]],
+          "Hash Algorithm": ["SHA 256", ["SHA 256", "SHA1", "MD5"]],
+          "Local Net/Mask": ["192.168.2.0/24", ["5.5.5.20/24", "192.168.2.0/24", "5.5.5.10/24", "192.168.1.0/24"]],
+          "Remote Net/Mask": ["192.168.1.0/24", ["5.5.5.10/24", "192.168.1.0/24", "192.168.2.0/24", "5.5.5.20/24"]]
+        }
+      }
+    };
+
+    let currentConcentrator = null;
+    let currentPhase = 1;
+    const userSelections = {};
+
+    function selectVPN(conc) {
+      currentConcentrator = conc;
+      currentPhase = 1;
+      loadForm();
+      const modal = document.getElementById('vpnModal');
+      const content = document.getElementById('vpnModalContent');
+      modal.style.display = 'block';
+      content.style.position = 'relative';
+    }
+
+    function closeModal() {
+      document.getElementById('vpnModal').style.display = 'none';
+    }
+
+    function makeDraggable(modal, handle) {
+      let offsetX = 0, offsetY = 0, isDragging = false;
+
+      handle.addEventListener('mousedown', function (e) {
+        isDragging = true;
+        const rect = modal.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        document.body.style.userSelect = 'none';
+      });
+
+      document.addEventListener('mousemove', function (e) {
+        if (isDragging) {
+          modal.style.position = 'absolute';
+          modal.style.left = `${e.clientX - offsetX}px`;
+          modal.style.top = `${e.clientY - offsetY}px`;
+        }
+      });
+
+      document.addEventListener('mouseup', function () {
+        isDragging = false;
+        document.body.style.userSelect = '';
+      });
+    }
+
+    function loadForm() {
+      const container = document.getElementById('dynamic-form'); container.innerHTML = '';
+      const title = document.createElement('div'); title.className = 'section-title'; title.textContent = `${currentConcentrator} - Phase ${currentPhase}`; container.appendChild(title);
+      const config = vpnData[currentConcentrator][`phase${currentPhase}`]; userSelections[currentConcentrator] = userSelections[currentConcentrator] || {};
+      const saved = userSelections[currentConcentrator][`phase${currentPhase}`] || {};
+      const selectionSet = {};
+      Object.entries(config).forEach(([field, [correct, options]]) => {
+        const row = document.createElement('div'); row.className = 'row';
+        const lbl = document.createElement('label'); lbl.textContent = field; row.appendChild(lbl);
+        if (options) {
+          const select = document.createElement('select');
+          const placeholder = document.createElement('option'); placeholder.value = ''; placeholder.textContent = 'Select...'; select.appendChild(placeholder);
+          options.forEach(opt => { const e = document.createElement('option'); e.value = opt; e.textContent = opt; select.appendChild(e); });
+          if (saved[field]) select.value = saved[field];
+          row.appendChild(select); selectionSet[field] = select;
+        } else {
+          const span = document.createElement('span'); span.textContent = correct; row.appendChild(span); selectionSet[field] = { value: () => correct };
+        }
+        container.appendChild(row);
+      });
+
+      const nav = document.createElement('div'); nav.className = 'nav-buttons';
+      const saveBtn = document.createElement('button'); saveBtn.textContent = 'Save';
+      saveBtn.onclick = () => {
+        userSelections[currentConcentrator][`phase${currentPhase}`] = {};
+        Object.entries(selectionSet).forEach(([k, el]) => userSelections[currentConcentrator][`phase${currentPhase}`][k] = el.value);
+        alert(`${currentConcentrator} Phase ${currentPhase} saved.`);
+      };
+      nav.appendChild(saveBtn);
+
+      if (currentPhase === 1) {
+        const nextBtn = document.createElement('button'); nextBtn.textContent = 'Next';
+        nextBtn.onclick = () => { currentPhase = 2; loadForm(); };
+        nav.appendChild(nextBtn);
+      } else {
+        const backBtn = document.createElement('button'); backBtn.textContent = 'Back';
+        backBtn.onclick = () => { currentPhase = 1; loadForm(); };
+        nav.appendChild(backBtn);
+
+        const finishBtn = document.createElement('button'); finishBtn.textContent = 'Finish';
+        finishBtn.onclick = () => { closeModal(); };
+        nav.appendChild(finishBtn);
+      }
+      container.appendChild(nav);
+    }
+
+    document.getElementById('submitAll').onclick = () => {
+      let score = 0, total = 0;
+      Object.entries(vpnData).forEach(([conc, phases]) => {
+        Object.entries(phases).forEach(([ph, fields]) => {
+          Object.entries(fields).forEach(([fld, [correct, options]]) => {
+            if (options) {
+              total++;
+              if (userSelections[conc]?.[ph]?.[fld] === correct) {
+                score++;
+              }
+            }
+          });
+        });
+      });
+      alert(`You got ${score} out of ${total} fields correct.`);
+    };
+
+    document.getElementById('resetAll').onclick = () => {
+      for (let k in userSelections) delete userSelections[k];
+      closeModal();
+    };
+
+    window.onload = () => {
+      makeDraggable(document.getElementById('vpnModalContent'), document.getElementById('drag-handle'));
+    };
+  </script>
+</body>
+</html>
