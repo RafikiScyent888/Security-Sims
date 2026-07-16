@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Security+ Simulation Lab</title>
+<style>
+:root{
+  --sky:#38bdf8;
+  --sky-dark:#0284c7;
+  --sky-deep:#0369a1;
+  --bg:#eaf6ff;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#5b7186;
+  --border:#d6ecfb;
+  --good:#16a34a;
+  --good-bg:rgba(22,163,74,0.12);
+  --progress-bg:rgba(3,105,161,0.1);
+}
+*{box-sizing:border-box}
+body{
+  font-family:"Segoe UI",Inter,Arial,sans-serif;
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(180deg,#bfe9ff 0%,var(--bg) 320px, var(--bg) 100%);
+  color:var(--text);
+}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 60px}
+.hero{
+  background:linear-gradient(135deg,var(--sky) 0%,var(--sky-dark) 100%);
+  color:#fff;
+  border-radius:18px;
+  padding:26px 28px;
+  box-shadow:0 12px 30px rgba(3,105,161,0.25);
+  margin-bottom:18px;
+}
+h1{margin:0 0 6px 0;font-size:26px}
+.sub{color:rgba(255,255,255,0.92);font-size:14.5px;margin:0;line-height:1.5}
+.disclaimer{
+  background:rgba(3,41,64,0.9);
+  color:#f0f9ff;
+  font-size:12.5px;
+  line-height:1.5;
+  border-radius:12px;
+  padding:10px 16px;
+  margin:16px 0 22px;
+  text-align:center;
+}
+.disclaimer strong{color:#fde047}
+.progress-bar-wrap{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 20px;
+  margin-bottom:22px;
+  box-shadow:0 6px 18px rgba(3,105,161,0.08);
+}
+.progress-row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.progress-label{font-weight:700;font-size:14.5px;color:var(--sky-deep)}
+.progress-track{
+  flex:1;
+  min-width:160px;
+  height:10px;
+  background:var(--progress-bg);
+  border-radius:999px;
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--sky-dark),var(--good));
+  border-radius:999px;
+  transition:width .3s ease;
+  width:0%;
+}
+.progress-count{font-size:13.5px;color:var(--muted);white-space:nowrap}
+.reset-btn{
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--muted);
+  font-size:12.5px;
+  padding:6px 12px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.reset-btn:hover{border-color:var(--sky-dark);color:var(--sky-deep)}
+h2{margin:0 0 4px 0;font-size:18px;color:var(--sky-deep)}
+.section-sub{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+.tiles{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:16px;
+}
+.tile{
+  position:relative;
+  border-radius:18px;
+  padding:20px 18px;
+  color:#fff;
+  text-decoration:none;
+  min-height:140px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  box-shadow:0 10px 24px rgba(2,6,23,0.18);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.tile:hover{transform:translateY(-4px);box-shadow:0 16px 32px rgba(2,6,23,0.28)}
+.tile .icon{font-size:32px;line-height:1}
+.tile .ttitle{font-size:16.5px;font-weight:800;margin-top:10px;line-height:1.25}
+.tile .tsub{font-size:12.5px;opacity:.92;margin-top:6px}
+.tile .badge{
+  position:absolute;
+  top:14px;
+  right:14px;
+  font-size:11px;
+  font-weight:700;
+  padding:3px 9px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.22);
+  backdrop-filter:blur(2px);
+}
+.tile .badge.completed{background:#fff;color:var(--good)}
+.tile.lightning{background:linear-gradient(135deg,#a78bfa,#4c1d95)}
+.tile.fire{background:linear-gradient(135deg,#fb923c,#dc2626)}
+.tile.storm{background:linear-gradient(135deg,#475569,#1e293b)}
+.tile.sun{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#4a2c00}
+.tile.sun .tsub{color:#5c3a00}
+.tile.sun .badge{background:rgba(0,0,0,0.15);color:#4a2c00}
+.tile.sun .badge.completed{background:#fff;color:#166534}
+.tile.green{background:linear-gradient(135deg,#34d399,#059669)}
+.refs{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 20px;
+  margin-top:26px;
+}
+.refs ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px 16px}
+.refs li a{color:var(--sky-deep);text-decoration:none;font-size:13.5px}
+.refs li a:hover{text-decoration:underline}
+footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  margin-top:32px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>Security+ Simulation Lab</h1>
+    <p class="sub">Interactive, performance-based practice simulations (PBQs) covering CompTIA Security+ scenarios &mdash; incident response, malware analysis, network defense, and cloud/VPN security labs.</p>
+  </div>
+
+  <div class="disclaimer"><strong>Educational use only.</strong> This site is a self-study practice tool built from original simulation exercises. It is not affiliated with, endorsed by, or sponsored by CompTIA&reg;. CompTIA and Security+ are trademarks of CompTIA, Inc. Always confirm current exam content on comptia.org.</div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-row">
+      <span class="progress-label">Your progress</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="progress-count" id="progressCount">0 of 10 completed</span>
+      <button class="reset-btn" id="resetBtn">Reset progress</button>
+    </div>
+  </div>
+
+  <h2>Simulations</h2>
+  <p class="section-sub">Click a tile to open that simulation. Each one opens in this same tab with a "Back to Dashboard" link at the top, so you can leave and come back anytime &mdash; your completed simulations stay marked on this page.</p>
+  <div class="tiles" id="tiles"></div>
+
+  <div class="refs">
+    <h2>Reference Materials</h2>
+    <p class="section-sub">Answer keys and supporting documents.</p>
+    <ul>
+      <li><a href="PBQ_Infection_Analysis_Study_Handout.pdf">Infection Analysis &mdash; Study Handout (PDF)</a></li>
+      <li><a href="Malware%20PBQ%20solution.jpg">Malware PBQ &mdash; Solution (Image)</a></li>
+      <li><a href="Site%20to%20Site%20VPN%20Solution.docx">Site-to-Site VPN &mdash; Solution (DOCX)</a></li>
+      <li><a href="Cloud%20arc%20solution.jpg">Cloud Architecture &mdash; Solution (Image)</a></li>
+      <li><a href="Linux%20Password%20List%20answers.jpg">Linux Password List &mdash; Answers (Image)</a></li>
+      <li><a href="Network%20Threat%20Analysis/Network%20Threat%20PBQ%20answer%20key.jpg">Network Threat Analysis &mdash; Answer Key (Image)</a></li>
+    </ul>
+  </div>
+
+  <footer>Security+ Simulation Lab &middot; For educational practice purposes only &middot; Not affiliated with CompTIA</footer>
+</div>
+
+<script>
+const SIMS = [
+  { id:"attacks-remediations", href:"Attacks-Remediations.html", theme:"lightning", icon:"🛡️", title:"Attacks & Remediations", sub:"Match attacks to their remediations" },
+  { id:"compromised-endpoint", href:"Identify and Contain a Compromised Endpoint.html", theme:"fire", icon:"🚨", title:"Compromised Endpoint Response", sub:"Identify and contain an active compromise" },
+  { id:"malware-identification", href:"Malware Identification.html", theme:"storm", icon:"🦠", title:"Malware Identification", sub:"Identify malware from behavioral indicators" },
+  { id:"network-threat-analysis", href:"Network Threat Analysis/Network Threat Analysis.html", theme:"sun", icon:"🕵️", title:"Network Threat Analysis", sub:"Analyze network traffic for threats" },
+  { id:"infection-analysis-pbq", href:"PBQ_Infection_Analysis_v10.html", theme:"green", icon:"🧫", title:"Infection Analysis PBQ", sub:"Trace and remediate a malware infection" },
+  { id:"physical-security", href:"Physical Security.html", theme:"lightning", icon:"🔒", title:"Physical Security", sub:"Place physical security controls correctly" },
+  { id:"ssh-keys", href:"SSH Keys.html", theme:"fire", icon:"🔑", title:"SSH Keys", sub:"Configure SSH key-based authentication" },
+  { id:"site-to-site-vpn", href:"Site-to-Site VPN.html", theme:"storm", icon:"🔐", title:"Site-to-Site VPN", sub:"Configure a site-to-site VPN tunnel" },
+  { id:"vpc-architecture", href:"VPC Architecture.html", theme:"sun", icon:"☁️", title:"VPC Architecture", sub:"Design a secure cloud VPC architecture" },
+  { id:"firewall-acl-pbq", href:"firewall-acl-pbq.html", theme:"green", icon:"🧱", title:"Firewall ACL PBQ", sub:"Analyze and correct firewall ACL rules" },
+];
+
+const KEY = "simhub_progress_securitysims";
+function loadProgress(){
+  try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ return {}; }
+}
+function saveProgress(p){ localStorage.setItem(KEY, JSON.stringify(p)); }
+
+function render(){
+  const progress = loadProgress();
+  const tilesEl = document.getElementById("tiles");
+  tilesEl.innerHTML = "";
+  let completedCount = 0;
+
+  SIMS.forEach(sim => {
+    const state = progress[sim.id];
+    const status = state ? state.status : "not-started";
+    if (status === "completed") completedCount++;
+
+    const a = document.createElement("a");
+    a.href = sim.href;
+    a.className = `tile ${sim.theme}`;
+
+    let badgeHtml = "";
+    if (status === "completed") badgeHtml = `<span class="badge completed">✓ Completed</span>`;
+    else if (status === "in-progress") badgeHtml = `<span class="badge">In progress</span>`;
+
+    a.innerHTML = `
+      ${badgeHtml}
+      <div class="icon">${sim.icon}</div>
+      <div>
+        <div class="ttitle">${sim.title}</div>
+        <div class="tsub">${sim.sub}</div>
+      </div>
+    `;
+    tilesEl.appendChild(a);
+  });
+
+  const pct = Math.round((completedCount / SIMS.length) * 100);
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressCount").textContent = `${completedCount} of ${SIMS.length} completed`;
+}
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (confirm("Reset all simulation progress on this device?")) {
+    saveProgress({});
+    render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
